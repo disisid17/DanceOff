@@ -619,7 +619,7 @@ if __name__ == '__main__':
     model_name = 'level1_pose_model'
     
 
-    with open(f'./test/mediapipe-ymca/{model_name}.pkl', 'rb') as f:
+    with open(f'./DanceOff/models/{model_name}.pkl', 'rb') as f:
         model = joblib.load(f)
 
     
