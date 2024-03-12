@@ -1,0 +1,6 @@
+Pipeline(steps=[('standardscaler', StandardScaler()),
+                ('logisticregression',
+                 LogisticRegression(C=10, multi_class='multinomial',
+                                    solver='sag'))])
+{'logisticregression__C': 10, 'logisticregression__max_iter': 100, 'logisticregression__penalty': 'l2', 'logisticregression__solver': 'sag'}
+1.0
