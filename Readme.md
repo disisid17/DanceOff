@@ -6,43 +6,6 @@ This repo contains the code used to re-create the 70's dance craze 'YMCA' by 'Th
 
 Using the MediaPipe pose detection models, train a custom model to recognize the Y, M, C and A poses from the 70s YMCA song.
 
-![YMCADance](./media/ymca_dance.gif)
-
-
-## Quick Start Setup (MacOS)
-
-When starting the pose predictions script for the first time, it might take 10-15 seconds to startup as it loads the necessarly libraries.  Subsequent executions will start faster.
-
-```shell
-git clone https://github.com/youngsoul/mediapipe-ymca.git
-cd mediapipe-ymca
-python3 -m venv venv
-source venv/bin/activate
-pip install -r requirements.txt
-python 03_pose_predictions.py
-```
-
-Here are some examples of the iconic dance poses.
-
-### Y
-![YPose](./data/Y.png)
-
-![YPoseMP](./data/Y-pose.png)
-
-### M
-![MPose](./data/M.png)
-
-![MPoseMP](./data/M-pose.png)
-
-### C
-![CPose](./data/C.png)
-
-![CPoseMP](./data/C-pose.png)
-
-### A
-![APose](./data/A.png)
-
-![APoseMP](./data/A-pose.png)
 
 ## Approach
 
@@ -50,13 +13,11 @@ Here are some examples of the iconic dance poses.
 
 * Save the x,y,z coordinates of the arms and wrists for each pose to a csv file
 
-![CapturePoses](./images/Y-before-after.png)
 
 ### Machine Learning Process
 
 Below is a picture of the general flow of the Machine Learning Process
 
-![MLProc](./images/ymca-arch/ymca-arch.001.png)
 
 
 Sample captured data
@@ -75,42 +36,10 @@ dance,0.611475766,0.389867514,-0.112690762,0.412283182,0.391914904,-0.052637506,
 
 * In real-time predict the pose.
 
-## Bonus
-
-While dancing to the YMCA is always fun, it is more fun with additional dancers.  So to create some 'virtual' village people I added an option to add additional dancers.
-
-## Jupyter Notebooks
-
-For more detail on the approach see the Jupyter Notebooks
 
 ## Setup
 
-### Install Libraries
 
-`see setup.py`
-
-```shell
-pip install -r requirements.txt
-```
-
-## Making Predictions
-
-It is always more fun to have the music to dance to.  In the `media` directory I have a short clip of the YMCA song to you dance to.
-
-* Example 1
-
-No parameters meaning the script will take all the default parameters
-
-```shell
-python 03_pose_predictions.py 
-```
-
-* Example 2
-
-remove pose from main person and add dancers
-```shell
-python 03_pose_predictions.py --add-dancers --suppress-landmarks
-```
 
 ## Collecting Pose Data
 
