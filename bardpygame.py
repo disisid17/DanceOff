@@ -43,7 +43,7 @@ def randcol():#define a completely random color generator with all possible colo
     value = hexe.lstrip('#')
     lv = len(value)
     return tuple(int(value[i:i +lv//3],16) for i in range(0,lv,lv//3))
-def texer(surface,text,color, fonts,x,y):
+def texer(surface,text,fonts, color,x,y):
     font = pygame.font.Font("./mediapipe-ymca/ComicSansMS3.ttf", int(fonts/1.25))
     text_surface = font.render(text,True,color)
     text_rect = text_surface.get_rect()
@@ -243,12 +243,13 @@ class Button:
         self.width = width * self.scale
         self.height = height * self.scale
         fonts = int(self.scale * fonts)
+        self.thi = thi
         self.font = pygame.font.Font("./mediapipe-ymca/ComicSansMS3.ttf", int(fonts/1.25))
         font = pygame.font.Font("./mediapipe-ymca/ComicSansMS3.ttf", int(fonts/1.25))
-        self.rects = pygame.Rect(x - self.width * 0.025, y - self.width * 0.025, self.width * 1.05,
-                                 self.height + self.width * 0.05)
+        self.rects = pygame.Rect(x - self.width * 0.025 * self.thi/10, y - self.width * 0.025*self.thi/10, self.width + self.width * .05 * self.thi/10,
+                                 self.height + self.width * 0.05 * self.thi/10)
         self.rect = pygame.Rect(x, y, self.width, self.height)
-        self.thi = thi
+        
         
         self.oc = oc
         self.color = color
@@ -271,9 +272,9 @@ class Button:
         if self.make:
             if self.oc:
                 pass
-                pygame.draw.rect(surface, self.oc, self.rects, 0, border_radius=int(self.scale * self.thi))
+                pygame.draw.rect(surface, self.oc, self.rects, 0, border_radius=int(self.scale * 10))
             
-            pygame.draw.rect(surface, self.color, self.rect, 0, border_radius=int(self.scale * self.thi))
+            pygame.draw.rect(surface, self.color, self.rect, 0, border_radius=int(self.scale * 10))
 
             if self.text != '':
                 if not ml:
@@ -334,7 +335,7 @@ def main_menu():
     buttons = create_buttons()
     levs = level_select_screen()
     welc = Button(300, 50, 200, 100, WHITE, "Welcome to Dance-off!", RED, fonts=60)
-    info = Button(720, 40, 20, 20, WHITE, 'i',oc = BLACK,thi = 20,fonts = 20)
+    info = Button(720, 40, 20, 20, WHITE, 'i',oc = BLACK,thi = 10,fonts = 20)
     difsel = False
     levsel = False
     while not levsel:
@@ -430,10 +431,10 @@ def leva(lev):
 
 def shot(orda):
     ret = []
-    ret.append(Button(400, 50, 20, 10, WHITE, str(orda), RED, fonts=48))
+    ret.append(Button(400, 35, 20, 10, WHITE, "Complete these moves:", RED, fonts=48))
 
     for i, act in enumerate(orda):
-        ret.append(Button(30 + i * 60, 100 + i * 00, 20, 10, WHITE, str(act), RED, fonts=36))
+        ret.append(Button(100 + i * 00, 125 + i * 450/len(orda), 20, 10, WHITE, str(act), RED, fonts=36))
     return ret
 
 
@@ -478,9 +479,9 @@ def game(lev, dif):
         case 3:
             col = GREEN
         case 2:
-            col = GREEN
+            col = YELLOW
         case 1:
-            col = GREEn
+            col = RED
     while not ex:
         mouse_pos = pygame.mouse.get_pos()
 
@@ -532,17 +533,19 @@ def game(lev, dif):
         back = Button(15, 15, swi / 1.95, swi * 4 / 10, WHITE, '', RED, fonts=24, oc=RED, round=False)
         for i in range(len(order)):
             more.append("?")
-        cors = Button(670, 350, 100, 100, WHITE, '', RED, fonts=30, round=False)
+        cors = Button(675, 350, 100, 100, WHITE, '', RED, fonts=28, round=False)
+        bord = Button(663, 15, swi/12, swi * 3.05/10,WHITE,'',RED,oc = RED,round = False,thi=40)
         for act in order:
             top = "Finished:"
             for i in more:
                 top += ("\n" + i)
-            we = Button(675, 15, 100, 200, WHITE, top, RED, fonts=24, round=False)
+            we = Button(675, 20, 100, 200, WHITE, top, RED, fonts=24, round=False)
             
             while pos != act:
 
                 screen.fill(WHITE)
                 back.draw(screen)
+                
                 frame, pos= retpose()
                 shap = frame.shape
                 frame=pygame.image.frombuffer(frame.tobytes(), frame.shape[1::-1], "BGR")
@@ -550,11 +553,11 @@ def game(lev, dif):
                 high.draw(screen)
                 
                 screen.blit(frame, (10, 10))
-
-                wel = Button(15, 483, 622, 100, WHITE, '', RED, fonts=24, oc=RED, round=False)
-                welar = Button(30, 487.5, 200, 100, WHITE, (
+                bord.draw(screen)
+                wel = Button(15, 483, 622, 80, WHITE, '', RED, fonts=24, oc=RED, round=False)
+                welar = Button(20, 489, 165, 70, WHITE, (
                             "Current Move: " + str(pos) + "\n" + "\nPossible Score: " + str(
-                        max(0, round(8 - since(), 3)))), RED, fonts=24, round=False)
+                        max(0, round(8 - since(), 3)))), RED, fonts=20, round=False)
 
                 we.draw(screen, True)
                 if since()>1.5:
@@ -602,8 +605,15 @@ def game(lev, dif):
 def endgame(psco):
     screen.fill(WHITE)
     while(since()<10):
+        screen.fill(WHITE)
         text = f"Final Score: {psco}"
-        texer(screen,text,24,WHITE,200,400)
+        texer(screen,text,48,BLACK,200,400)
+        pygame.display.flip()
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                ex = True
+            elif event.type == pygame.KEYDOWN and event.key == pygame.K_q:
+                ex = True
 
     
 pose_thread = threading.Thread(target=retpose)
