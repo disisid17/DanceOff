@@ -43,12 +43,12 @@ def randcol():#define a completely random color generator with all possible colo
     value = hexe.lstrip('#')
     lv = len(value)
     return tuple(int(value[i:i +lv//3],16) for i in range(0,lv,lv//3))
-def texer(surface,text,fonts, color,x,y):
+def texer(text,fonts, color,x,y):
     font = pygame.font.Font("./mediapipe-ymca/ComicSansMS3.ttf", int(fonts/1.25))
     text_surface = font.render(text,True,color)
     text_rect = text_surface.get_rect()
     text_rect.midtop = (x,y)
-    surface.blit(text_surface,text_rect)
+    screen.blit(text_surface,text_rect)
     pass
 def fps():
     global call_time
@@ -234,7 +234,7 @@ def multi(string: str, font, rect, fontColour, BGColour, justification=0):
 # Define button class
 class Button:
     global font
-    def __init__(self, x, y, width, height, color=BLACK, text='', text_color=BLACK, fonts=36, oc=WHITE, round=True, thi= 10):
+    def __init__(self, x, y, width, height, color=BLACK, text='', text_color=BLACK, fonts=36, oc=WHITE, round=True, thi= 10,alt = False):
         self.scale = swi / 800
         x = x * self.scale
         y = y * self.scale * 4 / 5
@@ -244,8 +244,11 @@ class Button:
         self.height = height * self.scale
         fonts = int(self.scale * fonts)
         self.thi = thi
-        self.font = pygame.font.Font("./mediapipe-ymca/ComicSansMS3.ttf", int(fonts/1.25))
-        font = pygame.font.Font("./mediapipe-ymca/ComicSansMS3.ttf", int(fonts/1.25))
+        
+        if not alt:
+            self.font = pygame.font.Font("./mediapipe-ymca/ComicSansMS3.ttf", int(fonts/1.25))
+        else:
+            self.font = pygame.font.Font(None, fonts)
         self.rects = pygame.Rect(x - self.width * 0.025 * self.thi/10, y - self.width * 0.025*self.thi/10, self.width + self.width * .05 * self.thi/10,
                                  self.height + self.width * 0.05 * self.thi/10)
         self.rect = pygame.Rect(x, y, self.width, self.height)
@@ -310,8 +313,9 @@ def create_buttons():
     easy_button = Button(100, 225, 200, 50, GREEN, 'Easy', oc=GREEN)
     medium_button = Button(100, 325, 200, 50, BLUE, 'Medium', oc=YELLOW)
     hard_button = Button(100, 425, 200, 50, RED, 'Hard', oc=RED)
-    
-    return [easy_button, medium_button, hard_button]
+    info = Button(720, 40, 50, 20, WHITE, 'INFO',oc = BLACK,thi = 10,fonts = 20)
+    cred = Button(710, 565, 80, 20,WHITE, 'CREDITS',BLUE,thi = 10,fonts = 15)
+    return [easy_button, medium_button, hard_button,info,cred]
 
 
 def level_select_screen():
@@ -335,7 +339,8 @@ def main_menu():
     buttons = create_buttons()
     levs = level_select_screen()
     welc = Button(300, 50, 200, 100, WHITE, "Welcome to Dance-off!", RED, fonts=60)
-    info = Button(720, 40, 20, 20, WHITE, 'i',oc = BLACK,thi = 10,fonts = 20)
+    
+    
     difsel = False
     levsel = False
     while not levsel:
@@ -348,7 +353,8 @@ def main_menu():
         if not difsel:
 
             welc.draw(screen)
-            info.draw(screen)
+            #cred.draw(screen)
+            #info.draw(screen)
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     running = False
@@ -362,10 +368,15 @@ def main_menu():
                                     dif = 3
                                 elif button.text == 'Medium':
                                     dif = 2
+                                elif button.text == 'CREDITS':
+                                    creds()
+                                elif button.text == 'INFO':
+                                    
+                                    infos()
                                 else:
                                     dif = 1
                                 #button.rem()
-                            print(f"Clicked {button.text} difficulty")
+                            print(f"Clicked {button.text}")
                             difsel = True
             for button in buttons:
                 if button.is_hover(mouse_pos):
@@ -463,6 +474,28 @@ def redo():
         exi.draw(screen)
         pygame.display.flip()
 
+def infos():
+    while True:
+        mouse_pos = pygame.mouse.get_pos()
+        screen.fill(WHITE)
+        texer("This Is DanceOff!", 100,RED ,360,30)
+        ex = Button(720, 20, 50, 50, WHITE, "x", fonts = 36,alt = True)
+        ex.draw(screen)
+        
+        for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    sys.exit()
+                elif event.type == pygame.KEYDOWN and event.key == pygame.K_q:
+                    pygame.quit()
+                    sys.exit()
+                elif event.type == pygame.MOUSEBUTTONDOWN and ex.is_hover(mouse_pos):
+                    return 1
+        pygame.display.flip()
+    
+
+def creds():
+    pass
 
 def game(lev, dif):
     timeTo = 2 + dif * 2
@@ -604,16 +637,16 @@ def game(lev, dif):
 
 def endgame(psco):
     screen.fill(WHITE)
-    while(since()<10):
+    while(since()<1000):
         screen.fill(WHITE)
         text = f"Final Score: {psco}"
-        texer(screen,text,48,BLACK,200,400)
+        texer(text,96,RED,600,200)
         pygame.display.flip()
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                ex = True
+                break
             elif event.type == pygame.KEYDOWN and event.key == pygame.K_q:
-                ex = True
+                break
 
     
 pose_thread = threading.Thread(target=retpose)
