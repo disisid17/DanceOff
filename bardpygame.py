@@ -370,9 +370,11 @@ def main_menu():
                                     dif = 2
                                 elif button.text == 'CREDITS':
                                     creds()
+                                    return main_menu()
                                 elif button.text == 'INFO':
                                     
                                     infos()
+                                    return main_menu()
                                 else:
                                     dif = 1
                                 #button.rem()
@@ -490,12 +492,34 @@ def infos():
                     pygame.quit()
                     sys.exit()
                 elif event.type == pygame.MOUSEBUTTONDOWN and ex.is_hover(mouse_pos):
-                    return 1
+                    return 
         pygame.display.flip()
     
 
 def creds():
-    pass
+    con = 0
+    while True:
+        
+        cur = since()
+        
+        
+        mouse_pos = pygame.mouse.get_pos()
+        screen.fill(WHITE)
+        con+=0.25
+        texer("A game by Sidharth Sandeep", 100,RED ,600,400-con)
+        ex = Button(720, 20, 50, 50, WHITE, "x", fonts = 36,alt = True)
+        ex.draw(screen)
+    
+        for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    sys.exit()
+                elif event.type == pygame.KEYDOWN and event.key == pygame.K_q:
+                    pygame.quit()
+                    sys.exit()
+                elif event.type == pygame.MOUSEBUTTONDOWN and ex.is_hover(mouse_pos):
+                    return 
+        pygame.display.flip()
 
 def game(lev, dif):
     timeTo = 2 + dif * 2
@@ -637,15 +661,18 @@ def game(lev, dif):
 
 def endgame(psco):
     screen.fill(WHITE)
-    while(since()<1000):
+    ex = False
+    while ex == False:
         screen.fill(WHITE)
         text = f"Final Score: {psco}"
         texer(text,96,RED,600,200)
         pygame.display.flip()
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
+                ex = True
                 break
             elif event.type == pygame.KEYDOWN and event.key == pygame.K_q:
+                ex = True
                 break
 
     
@@ -668,7 +695,7 @@ if __name__ == '__main__':
     
     # Initiate holistic model
 
-    
+    last()
     while True:
         lev, dif = main_menu()
         print(dif)
