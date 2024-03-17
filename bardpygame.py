@@ -12,7 +12,7 @@ import sys
 import random
 from random import choice
 import time
-
+from credits import credit
 
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
@@ -313,7 +313,7 @@ def create_buttons():
     easy_button = Button(100, 225, 200, 50, GREEN, 'Easy', oc=GREEN)
     medium_button = Button(100, 325, 200, 50, BLUE, 'Medium', oc=YELLOW)
     hard_button = Button(100, 425, 200, 50, RED, 'Hard', oc=RED)
-    info = Button(720, 40, 50, 20, WHITE, 'INFO',oc = BLACK,thi = 10,fonts = 20)
+    info = Button(700, 40, 70, 20, WHITE, 'Tutorial',oc = BLACK,thi = 10,fonts = 20)
     cred = Button(710, 565, 80, 20,WHITE, 'CREDITS',BLUE,thi = 10,fonts = 15)
     return [easy_button, medium_button, hard_button,info,cred]
 
@@ -498,6 +498,7 @@ def infos():
 
 def creds():
     con = 0
+    cols = []
     while True:
         
         cur = since()
@@ -505,11 +506,19 @@ def creds():
         
         mouse_pos = pygame.mouse.get_pos()
         screen.fill(WHITE)
-        con+=0.25
-        texer("A game by Sidharth Sandeep", 100,RED ,600,400-con)
+        con+=1
+        texer("A game by Sidharth Sandeep", 100,RED ,600,100-con)
         ex = Button(720, 20, 50, 50, WHITE, "x", fonts = 36,alt = True)
         ex.draw(screen)
-    
+        
+        for num,word in enumerate(credit[0:50]):
+            try:
+                cols[num]
+            except IndexError:
+                cols.append(randcol())
+            texer(f"{word}: Sidharth Sandeep",50,cols[num],600,200+num*50-con)
+            if (200 + 50 * 50 - con)<00:
+                return
         for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     pygame.quit()
@@ -703,6 +712,7 @@ if __name__ == '__main__':
         psco = game(lev, dif)
         endgame(psco)
         redo()
+        
                 
         #if cv2.waitKey(1) & 0xFF == ord('q'):
                 
