@@ -12,6 +12,8 @@ import sys
 import random
 from random import choice
 import time
+import csv
+import os
 from credits import credit
 
 WHITE = (255, 255, 255)
@@ -318,9 +320,9 @@ def create_buttons():
     return [easy_button, medium_button, hard_button,info,cred]
 
 def read_leaderboard():
-    if not os.path.exists("leaderboard.csv"):
+    if not os.path.exists("./DanceOff/leaderboard.csv"):
         return None
-    with open("leaderboard.csv", "r") as file:
+    with open("./DanceOff/leaderboard.csv", "r") as file:
         reader = csv.reader(file)
         leaderboard = list(reader)
     leaderboard.sort(key=lambda x: int(x[1]), reverse=True)  # Sort by score
@@ -328,9 +330,25 @@ def read_leaderboard():
 
 # Function to write score to leaderboard CSV
 def write_to_leaderboard(name, score):
-    with open("leaderboard.csv", "a", newline="") as file:
+    with open("./DanceOff/leaderboard.csv", "a", newline="") as file:
         writer = csv.writer(file)
         writer.writerow([name, score])
+
+def display_leaderboard():
+    screen.fill(WHITE)
+    texer("Leaderboard",48,RED,400,20)
+
+    leaderboard = read_leaderboard()
+    if leaderboard:
+        y = 100
+        for idx, entry in enumerate(leaderboard[:10]):
+            texer(f"{idx+1}. {entry[0]} - {entry[1]}",48,RED,400,y)
+            y += 40
+    else:
+        no_data_text = font.render("No data available", True, BLACK)
+        screen.blit(no_data_text, (WIDTH // 2 - no_data_text.get_width() // 2, 100))
+
+    pygame.display.flip()
 
 """ def level_select_screen():
     screen.fill(BLUE)
@@ -361,7 +379,7 @@ def nameToBoard(score):
                     name += event.unicode
 
         screen.fill(WHITE)
-        texer("Enter your name: " + name, 48,RED,200,400)
+        texer("Enter your name: " + name, 48,RED,400,400)
         pygame.display.flip()
         clock.tick(30)
 
@@ -375,7 +393,7 @@ def main_menu():
     dif = 0
     lev = 0
     buttons = create_buttons()
-    levs = level_select_screen()
+    #levs = level_select_screen()
     welc = Button(300, 50, 200, 100, WHITE, "Welcome to Dance-off!", RED, fonts=60)
     
     
@@ -551,7 +569,7 @@ def creds():
         ex = Button(720, 20, 50, 50, WHITE, "x", fonts = 36,alt = True)
         ex.draw(screen)
         
-        for num,word in enumerate(credit[0:50]):
+        for num,word in enumerate(credit[:50]):
             try:
                 cols[num]
             except IndexError:
@@ -711,12 +729,37 @@ def game(lev, dif):
 def endgame(psco):
     screen.fill(WHITE)
     ex = False
+    start = time.time()
     while ex == False:
+        mouse_pos = pygame.mouse.get_pos()
         screen.fill(WHITE)
         text = f"Final Score: {psco}"
         texer(text,96,RED,600,200)
+        yes = Button(100,400,200,50,WHITE,text = "YES",fonts = 36,oc = GREEN)
+        no = Button(500,400,200,50,WHITE,text = "NO",fonts = 36,oc = RED)
+        buttons = [yes,no]
+            
+        for button in buttons:
+                if button.is_hover(mouse_pos):
+                    button.color = HOVER
+                else:
+                    button.color = WHITE
+
+                button.draw(screen)
         pygame.display.flip()
         for event in pygame.event.get():
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                for button in buttons:
+                    if button.is_hover(mouse_pos) and button.make:
+                            if button.text == 'YES':
+                                    nameToBoard(int(round(psco,0)))
+                                    while time.time() - start < 25:
+
+                                        display_leaderboard()
+                                    
+                            elif button.text == 'NO':
+                                    ex = true
+                                    break
             if event.type == pygame.QUIT:
                 ex = True
                 break

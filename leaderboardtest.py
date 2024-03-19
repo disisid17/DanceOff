@@ -38,9 +38,9 @@ def display_leaderboard():
 
 # Function to read leaderboard from CSV file
 def read_leaderboard():
-    if not os.path.exists("leaderboard.csv"):
+    if not os.path.exists("./DanceOff/leaderboard.csv"):
         return None
-    with open("leaderboard.csv", "r") as file:
+    with open("./DanceOff/leaderboard.csv", "r") as file:
         reader = csv.reader(file)
         leaderboard = list(reader)
     leaderboard.sort(key=lambda x: int(x[1]), reverse=True)  # Sort by score
@@ -48,12 +48,12 @@ def read_leaderboard():
 
 # Function to write score to leaderboard CSV
 def write_to_leaderboard(name, score):
-    with open("leaderboard.csv", "a", newline="") as file:
+    with open("./DanceOff/leaderboard.csv", "a", newline="") as file:
         writer = csv.writer(file)
         writer.writerow([name, score])
 
 # Main function
-def nameToBoard(score):
+def main(score):
     running = True
     name = ""
     clock = pygame.time.Clock()
@@ -80,12 +80,12 @@ def nameToBoard(score):
         pygame.display.flip()
         clock.tick(30)
 
-    
+    display_leaderboard()
 
 # Example usage:
-score = 5000  # Replace with your game's score
-nameToBoard(score)
-display_leaderboard()
+score = 1000  # Replace with your game's score
+main(score)
+
 # Wait for a while before closing
 pygame.time.delay(5000)
 pygame.quit()
