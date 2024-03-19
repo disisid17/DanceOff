@@ -317,15 +317,53 @@ def create_buttons():
     cred = Button(710, 565, 80, 20,WHITE, 'CREDITS',BLUE,thi = 10,fonts = 15)
     return [easy_button, medium_button, hard_button,info,cred]
 
+def read_leaderboard():
+    if not os.path.exists("leaderboard.csv"):
+        return None
+    with open("leaderboard.csv", "r") as file:
+        reader = csv.reader(file)
+        leaderboard = list(reader)
+    leaderboard.sort(key=lambda x: int(x[1]), reverse=True)  # Sort by score
+    return leaderboard
 
-def level_select_screen():
+# Function to write score to leaderboard CSV
+def write_to_leaderboard(name, score):
+    with open("leaderboard.csv", "a", newline="") as file:
+        writer = csv.writer(file)
+        writer.writerow([name, score])
+
+""" def level_select_screen():
     screen.fill(BLUE)
     l1 = Button(300, 150, 200, 50, GREEN, "YMCA", oc=GREEN)
     l2 = Button(300, 250, 200, 50, BLACK, "Level 2", oc=YELLOW)
     hard_button = Button(300, 350, 200, 50, RED, 'Level 3', oc=RED)
     return [l1, l2, hard_button]
     # pygame.display.flip()
+ """
+def nameToBoard(score):
+    running = True
+    name = ""
+    clock = pygame.time.Clock()
 
+    while running:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    running = False
+                elif event.key == pygame.K_RETURN:
+                    write_to_leaderboard(name, score)
+                    running = False
+                elif event.key == pygame.K_BACKSPACE:
+                    name = name[:-1]
+                else:
+                    name += event.unicode
+
+        screen.fill(WHITE)
+        texer("Enter your name: " + name, 48,RED,200,400)
+        pygame.display.flip()
+        clock.tick(30)
 
 def exitb():
     screen.fill(HOVER)
@@ -348,7 +386,7 @@ def main_menu():
         if not difsel:
             screen.fill(WHITE)
         else:
-            screen.fill(BLUE)
+            screen.fill(WHITE)
         mouse_pos = pygame.mouse.get_pos()
         if not difsel:
 
@@ -371,7 +409,7 @@ def main_menu():
                                 elif button.text == 'CREDITS':
                                     creds()
                                     return main_menu()
-                                elif button.text == 'INFO':
+                                elif button.text == 'Tutorial':
                                     
                                     infos()
                                     return main_menu()
@@ -389,7 +427,9 @@ def main_menu():
                 button.draw(screen)
 
         else:
-            for event in pygame.event.get():
+            lev = 1
+            levsel = True
+            """ for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     running = False
                     pygame.quit()
@@ -412,8 +452,8 @@ def main_menu():
                     button.color = HOVER
                 else:
                     button.color = WHITE
-                button.draw(screen)
-
+                button.draw(screen) """
+            pass
         pygame.display.flip()
     return lev, dif
 
