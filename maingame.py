@@ -10,7 +10,7 @@ import pygame
 import threading
 import sys
 import random
-from random import choice
+from random import * 
 import time
 import csv
 import os
@@ -44,12 +44,19 @@ def randcol():#define a completely random color generator with all possible colo
     hexe = str("#"+colo1+colo2+colo3+colo4 +colo5 +colo6 )
     value = hexe.lstrip('#')
     lv = len(value)
-    return tuple(int(value[i:i +lv//3],16) for i in range(0,lv,lv//3))
-def texer(text,fonts, color,x,y):
+    #return tuple(int(value[i:i +lv//3],16) for i in range(0,lv,lv//3))
+    return (randint(0,255),randint(0,255),randint(0,255))
+def texer(text,fonts, color,x,y,just = 0):
     font = pygame.font.Font("./mediapipe-ymca/ComicSansMS3.ttf", int(fonts/1.25))
     text_surface = font.render(text,True,color)
     text_rect = text_surface.get_rect()
-    text_rect.midtop = (x,y)
+    match(just):
+        case 0:             
+            text_rect.topleft = (x,y)
+        case 1:
+            text_rect.midtop = (x,y)
+        case 2:
+            text_rect.topright = (x,y)
     screen.blit(text_surface,text_rect)
     pass
 def fps():
@@ -315,7 +322,7 @@ def create_buttons():
     easy_button = Button(100, 225, 200, 50, GREEN, 'Easy', oc=GREEN)
     medium_button = Button(100, 325, 200, 50, BLUE, 'Medium', oc=YELLOW)
     hard_button = Button(100, 425, 200, 50, RED, 'Hard', oc=RED)
-    info = Button(700, 40, 70, 20, WHITE, 'Tutorial',oc = BLACK,thi = 10,fonts = 20)
+    info = Button(700, 40, 70, 20, WHITE, 'Help',oc = BLACK,thi = 10,fonts = 20)
     cred = Button(710, 565, 80, 20,WHITE, 'CREDITS',BLUE,thi = 10,fonts = 15)
     return [easy_button, medium_button, hard_button,info,cred]
 
@@ -427,7 +434,7 @@ def main_menu():
                                 elif button.text == 'CREDITS':
                                     creds()
                                     return main_menu()
-                                elif button.text == 'Tutorial':
+                                elif button.text == 'Help':
                                     
                                     infos()
                                     return main_menu()
@@ -495,17 +502,24 @@ def leva(lev):
     ret = ret.split()
     
     states = ret
-    random.shuffle(states)
+    shuffle(states)
     print(states)
     return states
 
 
 def shot(orda):
     ret = []
+    pos = "YMCA"
+    ims = []
+    for let in pos:
+        ims.append(pygame.image.load(f"./downloads/{let}pose.png"))
+    ims.append(pygame.image.load("./downloads/dance.png"))
     ret.append(Button(400, 35, 20, 10, WHITE, "Complete these moves:", RED, fonts=48))
 
     for i, act in enumerate(orda):
-        ret.append(Button(100 + i * 00, 125 + i * 450/len(orda), 20, 10, WHITE, str(act), RED, fonts=36))
+        ret.append(Button(100 + i * 00, 125 + i  *  450/len(orda), 20, 10, WHITE, str(act), RED, fonts=36))
+        screen.blit(pygame.transform.scale(ims[i],(75,125)),(400,125 + i*1.5* 450/len(orda)))
+
     return ret
 
 
@@ -538,10 +552,12 @@ def infos():
     while True:
         mouse_pos = pygame.mouse.get_pos()
         screen.fill(WHITE)
-        texer("This Is DanceOff!", 100,RED ,360,30)
+        texer("This Is DanceOff!", 100,RED ,750,30,1)
         ex = Button(720, 20, 50, 50, WHITE, "x", fonts = 36,alt = True)
         ex.draw(screen)
-        
+        texer("What the game is:",50,BLUE,10, 150)
+        texer(" - DanceOff is a Just-Dance style game with a unique twist:",30,BLUE,10,220)
+        texer("    Instead of using a handheld controller, your dance moves are directly caught by the camera!",30,BLUE,10,250)
         for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     pygame.quit()
@@ -565,18 +581,19 @@ def creds():
         mouse_pos = pygame.mouse.get_pos()
         screen.fill(WHITE)
         con+=1
-        texer("A game by Sidharth Sandeep", 100,RED ,600,100-con)
+        texer("A game by Sidharth Sandeep", 100,RED ,750,50-con,1)
         ex = Button(720, 20, 50, 50, WHITE, "x", fonts = 36,alt = True)
         ex.draw(screen)
-        
+       
         for num,word in enumerate(credit[:50]):
             try:
                 cols[num]
             except IndexError:
                 cols.append(randcol())
-            texer(f"{word}: Sidharth Sandeep",50,cols[num],600,200+num*50-con)
+            texer(f"{word}: Sidharth Sandeep",50,cols[num],750,150+num*50-con,1)
             if (200 + 50 * 50 - con)<00:
                 return
+        texer("Why are you up here", 50, randcol(),750,-1000-con,1)
         for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     pygame.quit()
@@ -586,11 +603,14 @@ def creds():
                     sys.exit()
                 elif event.type == pygame.MOUSEBUTTONDOWN and ex.is_hover(mouse_pos):
                     return 
+                elif event.type == pygame.MOUSEWHEEL:
+                    con-=10 * event.y
+                    
         pygame.display.flip()
 
 def game(lev, dif):
     timeTo = 2 + dif * 2
-    scom = 0.90 + (3 - dif) * 0.1
+    scom = 0.80 + (3 - dif) * 0.2
     ex = False
 
     order = leva(lev)
@@ -617,11 +637,11 @@ def game(lev, dif):
         # screen.blit(scre,(200,50))
         screen.fill(WHITE)
 
-        if (ci == 0):
-            buts = shot(order)
-            buttonyy = Button(300, 250, 200, 50, WHITE, "Continue?", BLACK, 36, col)
+        
+        buts = shot(order)
+        buttonyy = Button(300, 250, 200, 50, WHITE, "Continue?", BLACK, 36, col)
 
-            ci += 1
+            
         for i in buts:
             i.draw(screen)
         if buttonyy.is_hover(mouse_pos):
@@ -643,7 +663,7 @@ def game(lev, dif):
                 ex = True
     escom = since()
     subt = 20 - escom * scom
-    scom = round(subt/20,0)
+    scom = max(subt/20 * scom,0)
 
     ex = False
 
@@ -654,6 +674,7 @@ def game(lev, dif):
         times = []
         comp = 0
         more = []
+        stq = 0
         back = Button(15, 15, swi / 1.95, swi * 4 / 10, WHITE, '', RED, fonts=24, oc=RED, round=False)
         for i in range(len(order)):
             more.append("?")
@@ -664,7 +685,8 @@ def game(lev, dif):
             for i in more:
                 top += ("\n" + i)
             we = Button(675, 20, 100, 200, WHITE, top, RED, fonts=24, round=False)
-            
+            ard = True
+            breaker = False
             while pos != act:
 
                 screen.fill(WHITE)
@@ -680,13 +702,15 @@ def game(lev, dif):
                 bord.draw(screen)
                 wel = Button(15, 483, 622, 80, WHITE, '', RED, fonts=24, oc=RED, round=False)
                 welar = Button(20, 489, 165, 70, WHITE, (
-                            "Current Move: " + str(pos) + "\n" + "\nPossible Score: " + str(
+                            "Current Move: " + str(pos) + "\n" + "\nSeconds Remaining: " + str(
                         max(0, round(8 - since(), 3)))), RED, fonts=20, round=False)
 
                 we.draw(screen, True)
-                if since()>1.5:
+                if since()>1.5 or stq == 0:
                     cors.draw(screen,newt = '')
+                    
                 else:
+                    stq+=1
                     cors.draw(screen,newt = 'CORRECT!')
                 wel.draw(screen)
                 welar.draw(screen, True)
@@ -696,15 +720,23 @@ def game(lev, dif):
                         ex = True
                     elif event.type == pygame.KEYDOWN and event.key == pygame.K_q:
                         ex = True
+                    elif event.type == pygame.KEYDOWN and event.key == pygame.K_c:
+                        """ times.append((act,8,0))
+                        ard = False """
+                        breaker = True
+                if breaker:
+                    break
             more[comp] = act
             comp += 1
             cors.draw(screen,newt = "CORRECT!")
             pygame.display.flip()
             itim = last()
             if (itim < timeTo):
-                times.append((act, round(8 - itim, 3), round(itim, 3)))
+                if ard:
+                    times.append((act, round(8-2/dif*itim, 3), round(itim, 3)))
             else:
-                times.append((act, 0, round(itim, 3)))
+                if ard:
+                    times.append((act, 0, round(itim, 3)))
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     ex = True
@@ -733,8 +765,9 @@ def endgame(psco):
     while ex == False:
         mouse_pos = pygame.mouse.get_pos()
         screen.fill(WHITE)
-        text = f"Final Score: {psco}"
-        texer(text,96,RED,600,200)
+        text = f"Do you want to put your final score of {int(round(psco,0))}"
+        texer(text,80,RED,750,200,1)
+        texer("onto the leaderboard?",80,RED,750,280,1)
         yes = Button(100,400,200,50,WHITE,text = "YES",fonts = 36,oc = GREEN)
         no = Button(500,400,200,50,WHITE,text = "NO",fonts = 36,oc = RED)
         buttons = [yes,no]
@@ -753,12 +786,33 @@ def endgame(psco):
                     if button.is_hover(mouse_pos) and button.make:
                             if button.text == 'YES':
                                     nameToBoard(int(round(psco,0)))
+                                    exas = Button(300, 450, 200, 50, WHITE, "Continue?", BLACK, 36, BLUE)
+                                    display_leaderboard()
                                     while time.time() - start < 25:
-
-                                        display_leaderboard()
-                                    
+                                        mouse_pos = pygame.mouse.get_pos()
+                                        
+                                        
+                                        #exas.draw(screen)
+                                        if exas.is_hover(mouse_pos):
+                                            exas.color = HOVER
+                                        else:
+                                            exas.color = WHITE
+                                        exas.draw(screen)
+                                        for event in pygame.event.get():
+                                            if event.type == pygame.QUIT:
+                                                pygame.quit()
+                                                sys.exit()
+                                            elif event.type == pygame.KEYDOWN and event.key == pygame.K_q:
+                                                pygame.quit()
+                                                sys.exit()
+                                            elif event.type == pygame.MOUSEBUTTONDOWN and exas.is_hover(mouse_pos):
+                                                return
+                                        
+                                        pygame.display.flip()
+                                    ex = True
+                                    break
                             elif button.text == 'NO':
-                                    ex = true
+                                    ex = True
                                     break
             if event.type == pygame.QUIT:
                 ex = True
