@@ -3,4 +3,4 @@ Pipeline(steps=[('standardscaler', StandardScaler()),
                  LogisticRegression(C=10, multi_class='multinomial',
                                     solver='sag'))])
 {'logisticregression__C': 10, 'logisticregression__max_iter': 100, 'logisticregression__penalty': 'l2', 'logisticregression__solver': 'sag'}
-0.9625766321125505
+0.9260654731371772

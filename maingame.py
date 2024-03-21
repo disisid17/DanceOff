@@ -29,7 +29,7 @@ Z_TRANSLATION_PIXELS = 100
 cap = cv2.VideoCapture(0)
 mp_drawing = mp.solutions.drawing_utils  # Drawing helpers
 mp_pose = mp.solutions.pose
-pose = mp_pose.Pose(min_detection_confidence=0.5, min_tracking_confidence=0.5)
+pose = mp_pose.Pose(min_detection_confidence=0.75, min_tracking_confidence=0.5)
 pose_lock = threading.Lock()
 last_call_time = None
 call_time = None
@@ -441,7 +441,7 @@ def main_menu():
                                 else:
                                     dif = 1
                                 #button.rem()
-                            print(f"Clicked {button.text}")
+                            #print(f"Clicked {button.text}")
                             difsel = True
             for button in buttons:
                 if button.is_hover(mouse_pos):
@@ -512,13 +512,13 @@ def shot(orda):
     pos = "YMCA"
     ims = []
     for let in pos:
-        ims.append(pygame.image.load(f"./downloads/{let}pose.png"))
-    ims.append(pygame.image.load("./downloads/dance.png"))
+        ims.append(let)
+    ims.append("dance")
     ret.append(Button(400, 35, 20, 10, WHITE, "Complete these moves:", RED, fonts=48))
 
     for i, act in enumerate(orda):
         ret.append(Button(100 + i * 00, 125 + i  *  450/len(orda), 20, 10, WHITE, str(act), RED, fonts=36))
-        screen.blit(pygame.transform.scale(ims[i],(75,125)),(400,125 + i*1.5* 450/len(orda)))
+        screen.blit(pygame.transform.scale(pygame.image.load(f"./downloads/{act}pose.png"),(75,125)),(400,125 + i*1.5* 450/len(orda)))
 
     return ret
 
@@ -537,7 +537,7 @@ def redo():
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if exi.is_hover(mouse_pos) and exi.make:
                     exi.rem()
-                    print("Restarting")
+                    #print("Restarting")
                     sel = True
 
         if exi.is_hover(mouse_pos):
@@ -619,14 +619,15 @@ def game(lev, dif):
     ci = 0
     buts = []
     col = None
-    match dif:
-        case 3:
-            col = GREEN
-        case 2:
-            col = YELLOW
-        case 1:
-            col = RED
+    
     while not ex:
+        match dif:
+            case 3:
+                col = GREEN
+            case 2:
+                col = YELLOW
+            case 1:
+                col = RED
         mouse_pos = pygame.mouse.get_pos()
 
         if count == 0:
@@ -640,7 +641,14 @@ def game(lev, dif):
         
         buts = shot(order)
         buttonyy = Button(300, 250, 200, 50, WHITE, "Continue?", BLACK, 36, col)
-
+        match(col):
+            case (0,255,0):
+                opco = RED
+            case (255,255,0):
+                opco = BLUE
+            case (255,0,0):
+                opco = GREEN
+        buttony2 = Button(300, 450, 200, 50, WHITE, "Go back?", BLACK, 36, opco)
             
         for i in buts:
             i.draw(screen)
@@ -649,6 +657,11 @@ def game(lev, dif):
         else:
             buttonyy.color = WHITE
         buttonyy.draw(screen)
+        if buttony2.is_hover(mouse_pos):
+            buttony2.color = HOVER
+        else:
+            buttony2.color = WHITE
+        buttony2.draw(screen)
         pygame.display.flip()
         if since() > timeTo:
             # ex = True
@@ -659,12 +672,17 @@ def game(lev, dif):
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 if buttonyy.is_hover(mouse_pos) and buttonyy.make:
                     ex = True
+                elif buttony2.is_hover(mouse_pos) and buttony2.make:
+                    lev,dif = main_menu()
+                    last()
             elif event.type == pygame.KEYDOWN and event.key == pygame.K_q:
                 ex = True
     escom = since()
     subt = 20 - escom * scom
-    scom = max(subt/20 * scom,0)
-
+    subt = max(dif,subt/4)
+    
+    scom = max(subt/5 * scom,0)
+    print(subt,scom)
     ex = False
 
     while not ex:
@@ -844,8 +862,8 @@ if __name__ == '__main__':
     last()
     while True:
         lev, dif = main_menu()
-        print(dif)
-        print(lev)
+        #print(dif)
+        #print(lev)
         psco = game(lev, dif)
         endgame(psco)
         redo()
