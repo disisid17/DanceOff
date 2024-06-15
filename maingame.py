@@ -29,7 +29,7 @@ Z_TRANSLATION_PIXELS = 100
 cap = cv2.VideoCapture(0)
 mp_drawing = mp.solutions.drawing_utils  # Drawing helpers
 mp_pose = mp.solutions.pose
-pose = mp_pose.Pose(min_detection_confidence=0.75, min_tracking_confidence=0.5)
+pose = mp_pose.Pose(min_detection_confidence=0.5, min_tracking_confidence=0.5)
 pose_lock = threading.Lock()
 last_call_time = None
 call_time = None
@@ -324,7 +324,7 @@ def create_buttons():
     hard_button = Button(100, 425, 200, 50, RED, 'Hard', oc=RED)
     info = Button(700, 40, 70, 20, WHITE, 'Help',oc = BLACK,thi = 10,fonts = 20)
     cred = Button(710, 565, 80, 20,WHITE, 'CREDITS',BLUE,thi = 10,fonts = 15)
-    return [easy_button, medium_button, hard_button,info,cred]
+    return [easy_button, medium_button, hard_button,cred]
 
 def read_leaderboard():
     if not os.path.exists("./DanceOff/leaderboard.csv"):
@@ -344,12 +344,16 @@ def write_to_leaderboard(name, score):
 def display_leaderboard():
     screen.fill(WHITE)
     texer("Leaderboard",48,RED,400,20)
-
+    leaders = []
     leaderboard = read_leaderboard()
     if leaderboard:
         y = 100
+        count = 0
         for idx, entry in enumerate(leaderboard[:10]):
-            texer(f"{idx+1}. {entry[0]} - {entry[1]}",48,RED,400,y)
+            if entry[0] not in leaders:
+                leaders.append((entry[0],entry[1]))
+            texer(f"{idx+1}. {leaders[idx][0]} - {leaders[idx][1]}",48,RED,400,y)
+            count+=2
             y += 40
     else:
         no_data_text = font.render("No data available", True, BLACK)
@@ -741,7 +745,7 @@ def game(lev, dif):
                     elif event.type == pygame.KEYDOWN and event.key == pygame.K_c:
                         """ times.append((act,8,0))
                         ard = False """
-                        breaker = True
+                        #breaker = True
                 if breaker:
                     break
             more[comp] = act
@@ -842,7 +846,7 @@ def endgame(psco):
     
 pose_thread = threading.Thread(target=retpose)
 pose_thread.start()
-swi = 1500
+swi = 1700
 screen = pygame.display.set_mode((swi, swi * 3 / 5))
 pygame.display.set_caption("Dance Game")
 
